@@ -3,10 +3,6 @@
 
 Handle g_FriendlyFire;
 
-// If you enable friendly fire, change this to true. Make sure to set this to
-// false at the end of the round in your cleanup function.
-
-bool g_FriendlyFireEnabled;
 bool g_DamageDisabled;
 
 enum SpecialDay 

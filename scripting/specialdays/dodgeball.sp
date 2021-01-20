@@ -3,7 +3,6 @@
 
 public void SpecialDay_Dodgeball_Begin()
 {
-    g_FriendlyFireEnabled = true;
     SetConVarBool(g_FriendlyFire, true);
 
     for (int i = 1; i <= MaxClients; i++)
@@ -24,7 +23,6 @@ public void SpecialDay_Dodgeball_Begin()
 
 public void SpecialDay_Dodgeball_End()
 {
-    g_FriendlyFireEnabled = false;
     SetConVarBool(g_FriendlyFire, false);
 }
 

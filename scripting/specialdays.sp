@@ -71,7 +71,6 @@ public void OnPluginStart()
 public void OnMapStart()
 {
     g_GunMenu = BuildGunMenu(MenuHandler_Weapon);
-    g_FriendlyFireEnabled = false;
     g_DamageDisabled = false;
 }
 
@@ -167,9 +166,8 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
     Action returnStatus = Plugin_Continue;
 
     // Since a lot of Special Days enable friendly fire, this is in the main
-    // file. Make sure to enable both the convar and set the global boolean
-    // to true in the SpecialDay_Begin function.
-    if (g_FriendlyFireEnabled)
+    // file. Make sure to enable the convar in the SpecialDay_Begin function.
+    if (GetConVarBool(g_FriendlyFire))
     {
         if (IsValidClient(victim) && IsValidClient(attacker) && GetClientTeam(victim) == GetClientTeam(attacker) && inflictor == attacker)
         {
