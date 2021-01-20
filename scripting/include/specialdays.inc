@@ -3,8 +3,6 @@
 
 Handle g_FriendlyFire;
 
-bool g_DamageDisabled;
-
 enum SpecialDay 
 {
     deathMatch,

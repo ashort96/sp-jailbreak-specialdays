@@ -71,7 +71,6 @@ public void OnPluginStart()
 public void OnMapStart()
 {
     g_GunMenu = BuildGunMenu(MenuHandler_Weapon);
-    g_DamageDisabled = false;
 }
 
 public void OnMapEnd()
@@ -157,7 +156,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
         return Plugin_Continue;
 
     // In the Countdown before the Special day starts, damage is disabled.
-    if (g_DamageDisabled)
+    else if (g_SpecialDayState == started)
     {
         damage = 0.0;
         return Plugin_Changed;
@@ -241,7 +240,6 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             }
         }
         g_Countdown = SD_DELAY;
-        g_DamageDisabled = true;
         CreateTimer(1.0, Timer_SpecialDay, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     }
     else if (action == MenuAction_Cancel)
@@ -305,7 +303,6 @@ public Action Timer_SpecialDay(Handle timer)
     else
     {
         delete timer;
-        g_DamageDisabled = false;
         g_SpecialDayState = active;
         Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
         Call_Finish();
