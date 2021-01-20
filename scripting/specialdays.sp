@@ -116,7 +116,10 @@ public Action Command_WardenSpecialDay(int client, int args)
 ///////////////////////////////////////////////////////////////////////////////
 public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
-    g_RoundsUntilWardenSpecialDay--;
+    if (g_RoundsUntilWardenSpecialDay > 0)
+        g_RoundsUntilWardenSpecialDay--;
+    else 
+        PrintToChatAll("%s A Warden Special Day is available!", SD_PREFIX);
 }
 
 public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
