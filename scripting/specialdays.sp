@@ -16,6 +16,7 @@
 #pragma newdecls required
 
 #include "specialdays/death_match.sp"
+#include "specialdays/dodgeball.sp"
 #include "specialdays/friendly_fire.sp"
 
 typedef FunctionPointer = function void ();
@@ -25,6 +26,7 @@ FunctionPointer SpecialDay_End;
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
 int g_RoundsUntilWardenSpecialDay = 50;
+int g_Countdown;
 
 Menu g_GunMenu;
 
@@ -70,6 +72,7 @@ public void OnMapStart()
 {
     g_GunMenu = BuildGunMenu(MenuHandler_Weapon);
     g_FriendlyFireEnabled = false;
+    g_DamageDisabled = false;
 }
 
 public void OnMapEnd()
@@ -114,6 +117,22 @@ public Action Command_WardenSpecialDay(int client, int args)
 ///////////////////////////////////////////////////////////////////////////////
 // Hooks
 ///////////////////////////////////////////////////////////////////////////////
+public void OnEntityCreated(int entity, const char[] classname)
+{
+    if (g_SpecialDayState == inactive)
+        return;
+
+    // If the SpecialDay needs to hook into OnEntityCreated(), do so here following this format:
+    // case SpecialDay: { SpecialDay_OnEntityCreated(entity, classname); }
+
+    switch(g_SpecialDay)
+    {
+        case dodgeball: { Dodgeball_OnEntityCreated(entity, classname); }
+        default: {}
+    }
+}
+
+
 public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
     if (g_RoundsUntilWardenSpecialDay > 0)
@@ -125,6 +144,7 @@ public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
     // Handle any cleanup here
+    PrintToChatAll("%s Special day is over!", SD_PREFIX);
     Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
     Call_Finish();
     g_SpecialDay = normal;
@@ -133,20 +153,40 @@ public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 
 public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)
 {
+
+    if (g_SpecialDayState == inactive)
+        return Plugin_Continue;
+
+    // In the Countdown before the Special day starts, damage is disabled.
+    if (g_DamageDisabled)
+    {
+        damage = 0.0;
+        return Plugin_Changed;
+    }
+
+    Action returnStatus = Plugin_Continue;
+
     // Since a lot of Special Days enable friendly fire, this is in the main
     // file. Make sure to enable both the convar and set the global boolean
-    // to true.
+    // to true in the SpecialDay_Begin function.
     if (g_FriendlyFireEnabled)
     {
-        if (!IsValidClient(victim) || !IsValidClient(attacker))
-            return Plugin_Continue;
-        if (GetClientTeam(victim) == GetClientTeam(attacker) && inflictor == attacker)
+        if (IsValidClient(victim) && IsValidClient(attacker) && GetClientTeam(victim) == GetClientTeam(attacker) && inflictor == attacker)
         {
             damage /= 0.35;
-            return Plugin_Changed;
+            returnStatus = Plugin_Changed;
         }
     }
-    return Plugin_Continue;
+
+    // If the SpecialDay needs to hook into OnTakeDamage(), do so here following this format:
+    // case SpecialDay: { returnStatus = SpecialDay_OnTakeDamage(victim, attacker, inflictor, damage, damgetype); }
+    switch(g_SpecialDay)
+    {
+        case dodgeball: { returnStatus = Dodgeball_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
+        default: {}
+    }
+
+    return returnStatus;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,9 +199,6 @@ void Callback_SpecialDay(int client)
         PrintToChat(client, "%s A Special Day has already been called!", SD_PREFIX);
         return;
     }
-
-    g_SpecialDayState = started;
-
     Menu specialDayMenu = new Menu(MenuHandler_SpecialDay);
 
     specialDayMenu.SetTitle("Special Days");
@@ -169,7 +206,7 @@ void Callback_SpecialDay(int client)
     {
         specialDayMenu.AddItem(SD_LIST[i], SD_LIST[i]);
     }
-    specialDayMenu.ExitButton = false;
+    specialDayMenu.ExitButton = true;
     specialDayMenu.Display(client, MENU_TIME_FOREVER);
 
 }
@@ -183,7 +220,18 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
     {
         PrintToChatAll("%s %s Special Day selected!", SD_PREFIX, SD_LIST[param2]);
         LogAction(param1, -1, "%N Started Special Day %s", param1, SD_LIST[param2]);
+
+        g_SpecialDayState = started;
         g_SpecialDay = view_as<SpecialDay>(param2);
+
+        for (int i = 1; i <= MaxClients; i++)
+        {
+            if (IsValidClient(i))
+            {
+                if ((GetClientTeam(i) == CS_TEAM_CT || GetClientTeam(i) == CS_TEAM_T) && !IsPlayerAlive(i))
+                CS_RespawnPlayer(i);
+            }
+        }
 
         switch (g_SpecialDay)
         {
@@ -194,8 +242,9 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
                 SpecialDay_End = SpecialDay_FriendlyFire_End;
             }
         }
-
-        CreateTimer(SD_DELAY, Timer_SpecialDay);
+        g_Countdown = SD_DELAY;
+        g_DamageDisabled = true;
+        CreateTimer(1.0, Timer_SpecialDay, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     }
     else if (action == MenuAction_Cancel)
     {
@@ -218,13 +267,13 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
         int weapon;
         menu.GetItem(param2, primary, sizeof(primary));
 
-        // TODO: Strip weapons
+        StripAllWeapons(param2);
 
         GivePlayerItem(param1, "weapon_knife");
         GivePlayerItem(param1, "weapon_deagle");
 
         weapon = GetPlayerWeaponSlot(param1, CS_SLOT_SECONDARY);
-        // TODO: Give Ammo
+        SetReserveAmmo(param1, weapon, 999);
 
         GivePlayerItem(param1, "weapon_flashbang");
         GivePlayerItem(param1, "weapon_hegrenade");
@@ -234,7 +283,7 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
 
         GivePlayerItem(param1, primary);
         weapon = GetPlayerWeaponSlot(param1, CS_SLOT_PRIMARY);
-        // TODO: Give Ammo
+        SetReserveAmmo(param1, weapon, 999);
     }
 
     else if (action == MenuAction_Cancel)
@@ -248,12 +297,21 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
 ///////////////////////////////////////////////////////////////////////////////
 // Timers
 ///////////////////////////////////////////////////////////////////////////////
-public Action Timer_SpecialDay(Handle timer, int client)
+public Action Timer_SpecialDay(Handle timer)
 {
-    Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
-    Call_Finish();
-    delete timer;
-    return Plugin_Handled;
+    if (g_Countdown > 0)
+    {
+        PrintCenterTextAll("Special Day begins in %i...", g_Countdown);
+        g_Countdown--;
+    }
+    else
+    {
+        delete timer;
+        g_DamageDisabled = false;
+        g_SpecialDayState = active;
+        Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
+        Call_Finish();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
