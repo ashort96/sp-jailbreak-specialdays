@@ -88,3 +88,20 @@ stock void SetReserveAmmo(int client, int weapon, int ammo)
         SetEntData(client, ammoOffset + (ammoType * 4), ammo, _, true);
     }
 }
+
+stock int GetMaximumIndexFromArray(int[] array, int size)
+{
+    int max = 0;
+    int returnIndex = 1;
+
+    for (int i = 1; i <= size; i++)
+    {
+        if (array[i] > max)
+        {
+            max = array[i];
+            returnIndex = i;
+        }
+    }
+
+    return returnIndex;
+}

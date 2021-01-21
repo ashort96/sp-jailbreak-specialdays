@@ -18,6 +18,7 @@
 #include "specialdays/death_match.sp"
 #include "specialdays/dodgeball.sp"
 #include "specialdays/friendly_fire.sp"
+#include "specialdays/grenade.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
@@ -62,6 +63,7 @@ public void OnPluginStart()
     RegAdminCmd("sm_sd", Command_SpecialDay, ADMFLAG_BAN);
 
     // Hooks
+    HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
     HookEvent("round_start", OnRoundStart);
     HookEvent("round_end", OnRoundEnd);
 
@@ -126,8 +128,33 @@ public void OnEntityCreated(int entity, const char[] classname)
     switch(g_SpecialDay)
     {
         case dodgeball: { Dodgeball_OnEntityCreated(entity, classname); }
+        case grenade: { Grenade_OnEntityCreated(entity, classname); }
         default: {}
     }
+}
+
+public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+{
+    if (g_SpecialDayState == inactive)
+    {
+        return;
+    }
+
+    int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+
+    // If friendly fire is enabled, we still want to give the person a frag
+    if (GetConVarBool(g_FriendlyFire))
+    {
+        int frags = GetEntProp(attacker, Prop_Data, "m_iFrags");
+        SetEntProp(attacker, Prop_Data, "m_iFrags", frags + 2);
+    }
+
+    switch(g_SpecialDay)
+    {
+        case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
+        default: {}
+    }
+
 }
 
 
@@ -232,11 +259,26 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
 
         switch (g_SpecialDay)
         {
+            case deathMatch:
+            {
+                SpecialDay_Begin = SpecialDay_DeathMatch_Begin;
+                SpecialDay_End = SpecialDay_DeathMatch_End;
+            }
+            case dodgeball:
+            {
+                SpecialDay_Begin = SpecialDay_Dodgeball_Begin;
+                SpecialDay_End = SpecialDay_Dodgeball_End;
+            }
             case friendlyFire:
             {
                 DisplayGunMenuToAll();
                 SpecialDay_Begin = SpecialDay_FriendlyFire_Begin;
                 SpecialDay_End = SpecialDay_FriendlyFire_End;
+            }
+            case grenade:
+            {
+                SpecialDay_Begin = SpecialDay_Grenade_Begin;
+                SpecialDay_End = SpecialDay_Grenade_End;
             }
         }
         g_Countdown = SD_DELAY;

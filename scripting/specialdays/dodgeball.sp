@@ -1,16 +1,10 @@
-#include <sourcemod>
-#include <sdkhooks>
-
 public void SpecialDay_Dodgeball_Begin()
 {
     SetConVarBool(g_FriendlyFire, true);
 
     for (int i = 1; i <= MaxClients; i++)
     {
-        if (!IsValidClient(i))
-            continue;
-        
-        if (!IsPlayerAlive(i))
+        if (!IsValidClient(i) || !IsPlayerAlive(i))
             continue;
         
         SetEntityHealth(i, 1);
