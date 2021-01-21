@@ -45,4 +45,15 @@ public Action Timer_DeathMatchEnd(Handle timer)
     {
         PrintToChatAll("%s The winner left the game!");
     }
+
+    // Slay everyone but the person that one
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i) && IsPlayerAlive(i))
+        {
+            if (i != clientIndex)
+                ForcePlayerSuicide(i);
+        }
+    }
+
 }
