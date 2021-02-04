@@ -162,6 +162,61 @@ public void Zombie_OnPlayerDisconnect(Handle event, const char[] name, bool dont
     }
 }
 
+public Action Zombie_JoinTeam(int client, int args)
+{
+    char teamString[3];
+    GetCmdArg(1, teamString, sizeof(teamString));
+    int newTeam = StringToInt(teamString);
+
+    // Make them a zombie
+    if (newTeam == CS_TEAM_CT)
+    {
+        CS_SwitchTeam(client, CS_TEAM_T);
+        CreateTimer(0.5, Timer_ZombieRevive, client);
+    }
+}
+
+public Action Zombie_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)
+{
+    if (!IsValidClient(attacker))
+        return Plugin_Continue;
+
+    if (GetClientTeam(victim) == CS_TEAM_T)
+    {
+        float attackerAngles[3];
+        float attackerPosition[3];
+        float victimPosition[3];
+
+        GetClientEyeAngles(attacker, attackerAngles);
+        GetClientEyePosition(attacker, attackerPosition);
+
+        TR_TraceRayFilter(attackerPosition, attackerAngles, MASK_ALL, RayType_Infinite, TraceFilter_IgnorePlayers);
+        TR_GetEndPosition(victimPosition);
+
+        float pushBack[3];
+        MakeVectorFromPoints(attackerPosition, victimPosition, pushBack);
+
+        float scale = damage * 3;
+        ScaleVector(pushBack, scale);
+
+        float velocity[3];
+        GetEntPropVector(victim, Prop_Data, "m_vecAbsVelocity", velocity);
+
+        float newVelocity[3];
+        AddVectors(velocity, pushBack, newVelocity);
+
+        SetEntPropVector(victim, Prop_Data, "m_vecAbsVelocity", newVelocity);
+    }
+
+    if (attacker == patientZero)
+    {
+        damage = 999.0;
+    }
+
+    return Plugin_Changed;
+    
+}
+
 public Action Timer_ZombieRevive(Handle timer, int client)
 {
     if (IsValidClient(patientZero) && IsPlayerAlive(patientZero))

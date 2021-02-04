@@ -272,6 +272,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
     switch(g_SpecialDay)
     {
         case dodgeball: { returnStatus = Dodgeball_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
+        case zombie: { returnStatus = Zombie_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
         default: {}
     }
 
