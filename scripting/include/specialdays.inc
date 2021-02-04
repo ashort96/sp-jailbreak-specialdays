@@ -45,7 +45,6 @@ char SD_LIST[][] =
     "Grenade",
     // "Gun Game",
     "Headshot",
-    // "Hide and Seek",
     "Juggernaut",
     "Knife",
     "Scoutknives",
