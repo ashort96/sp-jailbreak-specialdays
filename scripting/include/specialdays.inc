@@ -9,21 +9,21 @@ enum SpecialDay
     dodgeball,
     friendlyFire,
     grenade,
-    gunGame,
+    // gunGame,
     headshot,
-    hideAndSeek,
-    juggernaut,
-    knife,
-    laserWars,
-    scoutknives,
-    skyWars,
-    spectre,
-    tank,
-    zombie,
+    // hideAndSeek,
+    // juggernaut,
+    // knife,
+    // laserWars,
+    // scoutknives,
+    // skyWars,
+    // spectre,
+    // tank,
+    // zombie,
     normal
 };
 
-const int SD_LIST_SIZE = 15;
+const int SD_LIST_SIZE = 5;
 
 char SD_LIST[][] = 
 {
@@ -31,17 +31,17 @@ char SD_LIST[][] =
     "Dodgeball",
     "Friendly Fire",
     "Grenade",
-    "Gun Game",
+    // "Gun Game",
     "Headshot",
-    "Hide and Seek",
-    "Juggernaut",
-    "Knife",
-    "Laser Wars",
-    "Scoutknives",
-    "Sky Wars",
-    "Spectre",
-    "Tank",
-    "Zombie",
+    // "Hide and Seek",
+    // "Juggernaut",
+    // "Knife",
+    // "Laser Wars",
+    // "Scoutknives",
+    // "Sky Wars",
+    // "Spectre",
+    // "Tank",
+    // "Zombie",
 };
 
 enum SpecialDayState 
@@ -104,4 +104,9 @@ stock int GetMaximumIndexFromArray(int[] array, int size)
     }
 
     return returnIndex;
+}
+
+stock bool IsPlayerOnTeam(int client)
+{
+    return GetClientTeam(client) == CS_TEAM_CT || GetClientTeam(client) == CS_TEAM_T;
 }

@@ -19,6 +19,7 @@
 #include "specialdays/dodgeball.sp"
 #include "specialdays/friendly_fire.sp"
 #include "specialdays/grenade.sp"
+#include "specialdays/headshot.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
@@ -64,6 +65,7 @@ public void OnPluginStart()
 
     // Hooks
     HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
+    HookEvent("player_hurt", OnPlayerHurt, EventHookMode_Pre);
     HookEvent("round_start", OnRoundStart);
     HookEvent("round_end", OnRoundEnd);
 
@@ -133,6 +135,21 @@ public void OnEntityCreated(int entity, const char[] classname)
     }
 }
 
+public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
+{
+    if (g_SpecialDayState == inactive)
+    {
+        return;
+    }
+
+    switch (g_SpecialDay)
+    {
+        case headshot: { Headshot_OnPlayerHurt(event, name, dontBroadcast); }
+        default: {}
+    }
+
+}
+
 public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
     if (g_SpecialDayState == inactive)
@@ -149,7 +166,7 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
         SetEntProp(attacker, Prop_Data, "m_iFrags", frags + 2);
     }
 
-    switch(g_SpecialDay)
+    switch (g_SpecialDay)
     {
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
         default: {}
@@ -252,7 +269,7 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
         {
             if (IsValidClient(i))
             {
-                if ((GetClientTeam(i) == CS_TEAM_CT || GetClientTeam(i) == CS_TEAM_T) && !IsPlayerAlive(i))
+                if (IsPlayerOnTeam(i) && !IsPlayerAlive(i))
                 CS_RespawnPlayer(i);
             }
         }
@@ -391,7 +408,7 @@ void DisplayGunMenuToAll()
 
     for (int i = 1; i <= MaxClients; i++)
     {
-        if (IsValidClient(i) && GetClientTeam(i) == CS_TEAM_CT || GetClientTeam(i) == CS_TEAM_T)
+        if (IsValidClient(i) && IsPlayerOnTeam(i) && IsPlayerAlive(i))
         {
             DisplayGunMenu(i);
         }
