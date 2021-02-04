@@ -10,6 +10,7 @@
 #include <jailbreak>
 #include <sdkhooks>
 #include <sdktools>
+#include <SetCollisionGroup>
 #include <sourcemod>
 #include <specialdays>
 
@@ -24,6 +25,7 @@
 #include "specialdays/knife.sp"
 #include "specialdays/tank.sp"
 #include "specialdays/scoutknives.sp"
+#include "specialdays/zombie.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
@@ -68,6 +70,7 @@ public void OnPluginStart()
 
     // Hooks
     HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
+    HookEvent("player_disconnect", OnPlayerDisconnect, EventHookMode_Pre);
     HookEvent("player_hurt", OnPlayerHurt, EventHookMode_Pre);
     HookEvent("round_start", OnRoundStart);
     HookEvent("round_end", OnRoundEnd);
@@ -79,6 +82,7 @@ public void OnPluginStart()
 public void OnMapStart()
 {
     g_GunMenu = BuildGunMenu(MenuHandler_Weapon);
+    Zombie_OnMapStart();
 }
 
 public void OnMapEnd()
@@ -190,9 +194,24 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
         case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
         case scoutknives: { Scoutknives_OnPlayerDeath(event, name, dontBroadcast); }
+        case zombie: { Zombie_OnPlayerDeath(event, name, dontBroadcast); }
         default: {}
     }
 
+}
+
+public void OnPlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
+{
+    if (g_SpecialDayState == inactive)
+    {
+        return;
+    }
+
+    switch (g_SpecialDay)
+    {
+        case tank: { Tank_OnPlayerDisconnect(event, name, dontBroadcast); }
+        case zombie: { Zombie_OnPlayerDisconnect(event, name, dontBroadcast); }
+    }
 }
 
 
@@ -352,6 +371,12 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             {
                 SpecialDay_Begin = SpecialDay_Scoutknives_Begin;
                 SpecialDay_End = SpecialDay_Scoutknives_End;
+            }
+            case zombie:
+            {
+                DisplayGunMenuToAll();
+                SpecialDay_Begin = SpecialDay_Zombie_Begin;
+                SpecialDay_End = SpecialDay_Zombie_End;
             }
         }
         g_Countdown = SD_DELAY;

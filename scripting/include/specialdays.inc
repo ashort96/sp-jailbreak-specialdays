@@ -21,7 +21,7 @@ enum SpecialDay
     // skyWars,
     // spectre,
     tank,
-    // zombie,
+    zombie,
     normal
 };
 
@@ -35,7 +35,7 @@ enum SpecialDayState
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
 
-const int SD_LIST_SIZE = 9;
+const int SD_LIST_SIZE = 10;
 
 char SD_LIST[][] = 
 {
@@ -51,7 +51,7 @@ char SD_LIST[][] =
     // "Sky Wars",
     // "Spectre",
     "Tank",
-    // "Zombie",
+    "Zombie",
 };
 
 
