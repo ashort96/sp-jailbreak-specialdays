@@ -20,6 +20,7 @@
 #include "specialdays/friendly_fire.sp"
 #include "specialdays/grenade.sp"
 #include "specialdays/headshot.sp"
+#include "specialdays/juggernaut.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
@@ -169,6 +170,7 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
     switch (g_SpecialDay)
     {
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
+        case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
         default: {}
     }
 
@@ -296,6 +298,17 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             {
                 SpecialDay_Begin = SpecialDay_Grenade_Begin;
                 SpecialDay_End = SpecialDay_Grenade_End;
+            }
+            case headshot:
+            {
+                SpecialDay_Begin = SpecialDay_Headshot_Begin;
+                SpecialDay_End = SpecialDay_Headshot_End;
+            }
+            case juggernaut:
+            {
+                DisplayGunMenuToAll();
+                SpecialDay_Begin = SpecialDay_Juggernaut_Begin;
+                SpecialDay_End = SpecialDay_Juggernaut_End;
             }
         }
         g_Countdown = SD_DELAY;
