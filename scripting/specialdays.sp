@@ -233,6 +233,8 @@ public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
     if (g_SpecialDayState != inactive)
     {
         PrintToChatAll("%s Special day is over!", SD_PREFIX);
+        EnableWarden();
+        EnableWardenHud();
         Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
         Call_Finish();
     }
@@ -310,6 +312,9 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
     {
         PrintToChatAll("%s %s Special Day selected!", SD_PREFIX, SD_LIST[param2]);
         LogAction(param1, -1, "%N Started Special Day %s", param1, SD_LIST[param2]);
+
+        DisableWarden();
+        DisableWardenHud();
 
         g_SpecialDayState = started;
         g_SpecialDay = view_as<SpecialDay>(param2);

@@ -1,6 +1,8 @@
 int patientZero;
 int fogEnt;
 
+float deathPositions[MAXPLAYERS][3];
+
 public void SpecialDay_Zombie_Begin()
 {
     patientZero = GetRandomClient();
@@ -22,6 +24,8 @@ public void SpecialDay_Zombie_Begin()
         }
     }
 
+    PrintCenterTextAll("%N IS PATIENT ZERO!", patientZero);
+    EmitSoundToAll("music/hla.mp3");
     AcceptEntityInput(fogEnt, "TurnOn");
 }
 
@@ -120,13 +124,10 @@ public void Zombie_OnPlayerDeath(Handle event, const char[] name, bool dontBroad
 
     if (GetClientTeam(victim) == CS_TEAM_CT)
     {
-        float position[3];
-        GetClientAbsOrigin(victim, position);
-        position[2] -= 45.0;
-        CS_RespawnPlayer(victim);
-        TeleportEntity(victim, position, NULL_VECTOR, NULL_VECTOR);
-        CS_SwitchTeam(victim, CS_TEAM_T);
-        MakeZombie(victim);
+        GetClientAbsOrigin(victim, deathPositions[victim]);
+        deathPositions[victim][2] -= 45.0;
+        CreateTimer(0.5, Timer_ZombieMake, victim);
+
         EmitSoundToAll("npc/zombie/zombie_voice_idle1.wav");
 
         // Check to see if there is only one CT left...
@@ -204,6 +205,8 @@ public Action Zombie_OnTakeDamage(int victim, int &attacker, int &inflictor, flo
         float pushBack[3];
         MakeVectorFromPoints(attackerPosition, victimPosition, pushBack);
 
+        NormalizeVector(pushBack, pushBack);
+
         float scale = damage * 3;
         ScaleVector(pushBack, scale);
 
@@ -227,6 +230,9 @@ public Action Zombie_OnTakeDamage(int victim, int &attacker, int &inflictor, flo
 
 public Action Timer_ZombieRevive(Handle timer, int client)
 {
+    if (g_SpecialDayState == inactive)
+        return Plugin_Handled;
+
     if (IsValidClient(patientZero) && IsPlayerAlive(patientZero))
     {
         float position[3];
@@ -235,6 +241,21 @@ public Action Timer_ZombieRevive(Handle timer, int client)
         TeleportEntity(client, position, NULL_VECTOR, NULL_VECTOR);
         MakeZombie(client);
     }
+
+    return Plugin_Handled;
+}
+
+public Action Timer_ZombieMake(Handle timer, int client)
+{
+    if (g_SpecialDayState == inactive)
+        return Plugin_Handled;
+
+    CS_RespawnPlayer(client);
+    TeleportEntity(client, deathPositions[client], NULL_VECTOR, NULL_VECTOR);
+    CS_SwitchTeam(client, CS_TEAM_T);
+    MakeZombie(client);
+
+    return Plugin_Handled;
 }
 
 void MakeZombie(int client)

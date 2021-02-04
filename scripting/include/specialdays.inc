@@ -5,7 +5,7 @@ Handle g_FriendlyFire;
 
 int g_WeaponParent;
 
-int g_Teams[MAXPLAYERS] = {-1, ...};
+int g_Teams[MAXPLAYERS + 1];
 
 enum SpecialDay 
 {
@@ -149,11 +149,11 @@ stock void RestoreTeams()
 {
     for (int i = 1; i <= MaxClients; i++)
     {
-        if (IsValidClient(i) && IsPlayerOnTeam(i) && g_Teams[i] != -1)
+        if (IsValidClient(i) && IsPlayerOnTeam(i) && g_Teams[i] != GetClientTeam(i))
         {
             CS_SwitchTeam(i, g_Teams[i]);
         }
-        g_Teams[i] = -1;
+        g_Teams[i] = 0;
     }
 }
 
