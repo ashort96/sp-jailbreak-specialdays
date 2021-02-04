@@ -1,5 +1,5 @@
 #define SD_PREFIX "\x04[GP Special Days]\x07F8F8FF"
-#define SD_DELAY 20
+#define SD_DELAY 19
 
 Handle g_FriendlyFire;
 
