@@ -3,6 +3,8 @@
 
 Handle g_FriendlyFire;
 
+int g_WeaponParent;
+
 enum SpecialDay 
 {
     deathMatch,
@@ -11,10 +13,8 @@ enum SpecialDay
     grenade,
     // gunGame,
     headshot,
-    // hideAndSeek,
     juggernaut,
-    // knife,
-    // laserWars,
+    knife,
     // scoutknives,
     // skyWars,
     // spectre,
@@ -23,7 +23,7 @@ enum SpecialDay
     normal
 };
 
-const int SD_LIST_SIZE = 5;
+const int SD_LIST_SIZE = 7;
 
 char SD_LIST[][] = 
 {
@@ -35,8 +35,7 @@ char SD_LIST[][] =
     "Headshot",
     // "Hide and Seek",
     "Juggernaut",
-    // "Knife",
-    // "Laser Wars",
+    "Knife",
     // "Scoutknives",
     // "Sky Wars",
     // "Spectre",
@@ -109,4 +108,22 @@ stock int GetMaximumIndexFromArray(int[] array, int size)
 stock bool IsPlayerOnTeam(int client)
 {
     return GetClientTeam(client) == CS_TEAM_CT || GetClientTeam(client) == CS_TEAM_T;
+}
+
+stock void RemoveAllWeapons()
+{
+    int maxent = GetMaxEntities();
+    char weapon[64];
+
+    for (int i = MaxClients; i < maxent; i++)
+    {
+        if (IsValidEdict(i) && IsValidEntity(i))
+        {
+            GetEdictClassname(i, weapon, sizeof(weapon));
+            if (StrContains(weapon, "weapon_") != -1 || StrContains(weapon, "item_") != -1 && GetEntDataEnt2(i, g_WeaponParent) == -1)
+            {
+                RemoveEdict(i);
+            }
+        }
+    }
 }

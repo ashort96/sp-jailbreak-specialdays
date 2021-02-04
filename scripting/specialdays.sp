@@ -21,6 +21,7 @@
 #include "specialdays/grenade.sp"
 #include "specialdays/headshot.sp"
 #include "specialdays/juggernaut.sp"
+#include "specialdays/knife.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
@@ -28,6 +29,7 @@ FunctionPointer SpecialDay_End;
 
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
+
 int g_RoundsUntilWardenSpecialDay = 50;
 int g_Countdown;
 
@@ -45,11 +47,11 @@ public Plugin myinfo =
 public void OnPluginStart()
 {
     // Verify that the jailbreak plugin is running
-    bool pluginJailbreakExists = LibraryExists("jailbreak");
-    if (!pluginJailbreakExists)
-    {
-        SetFailState("This plugin requires jailbreak.smx to be running");
-    }
+    // bool pluginJailbreakExists = LibraryExists("jailbreak");
+    // if (!pluginJailbreakExists)
+    // {
+    //     SetFailState("This plugin requires jailbreak.smx to be running");
+    // }
 
     // Verify that we are on CS:S
     EngineVersion game = GetEngineVersion();
@@ -71,6 +73,7 @@ public void OnPluginStart()
     HookEvent("round_end", OnRoundEnd);
 
     g_FriendlyFire = FindConVar("mp_friendlyfire");
+    g_WeaponParent = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");
 }
 
 public void OnMapStart()
@@ -179,6 +182,10 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 
 public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
+
+    g_SpecialDay = normal;
+    g_SpecialDayState = inactive;
+
     if (g_RoundsUntilWardenSpecialDay > 0)
         g_RoundsUntilWardenSpecialDay--;
     else 
@@ -188,9 +195,13 @@ public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
 public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
     // Handle any cleanup here
-    PrintToChatAll("%s Special day is over!", SD_PREFIX);
-    Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
-    Call_Finish();
+    if (g_SpecialDayState != inactive)
+    {
+        PrintToChatAll("%s Special day is over!", SD_PREFIX);
+        Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
+        Call_Finish();
+    }
+
     g_SpecialDay = normal;
     g_SpecialDayState = inactive;
 }
@@ -310,9 +321,14 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
                 SpecialDay_Begin = SpecialDay_Juggernaut_Begin;
                 SpecialDay_End = SpecialDay_Juggernaut_End;
             }
+            case knife:
+            {
+                SpecialDay_Begin = SpecialDay_Knife_Begin;
+                SpecialDay_End = SpecialDay_Knife_End;
+            }
         }
         g_Countdown = SD_DELAY;
-        CreateTimer(1.0, Timer_SpecialDay, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(1.0, Timer_SpecialDay, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     }
     else if (action == MenuAction_Cancel)
     {
@@ -335,7 +351,9 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
         int weapon;
         menu.GetItem(param2, primary, sizeof(primary));
 
-        StripAllWeapons(param2);
+        StripAllWeapons(param1);
+        
+        PrintToChatAll("Giving %N knife and deagle - selected %s", param1, primary);
 
         GivePlayerItem(param1, "weapon_knife");
         GivePlayerItem(param1, "weapon_deagle");
@@ -371,13 +389,16 @@ public Action Timer_SpecialDay(Handle timer)
     {
         PrintCenterTextAll("Special Day begins in %i...", g_Countdown);
         g_Countdown--;
+        return Plugin_Continue;
     }
     else
     {
-        delete timer;
+        PrintToChatAll("%s Special day started!", SD_PREFIX);
+        PrintCenterTextAll("Special day started!");
         g_SpecialDayState = active;
         Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
         Call_Finish();
+        return Plugin_Stop;
     }
 }
 
@@ -404,7 +425,7 @@ Menu BuildGunMenu(MenuHandler gunMenuHandler)
     Menu gunMenu = new Menu(gunMenuHandler);
     for (int i = 0; i < numGuns; i++)
     {
-        gunMenu.AddItem(gunDisplay[i], gunName[i]);
+        gunMenu.AddItem(gunName[i], gunDisplay[i]);
     }
     gunMenu.SetTitle("Weapon Selection");
     return gunMenu;

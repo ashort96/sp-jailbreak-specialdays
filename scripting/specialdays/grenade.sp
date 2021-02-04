@@ -1,7 +1,7 @@
 public void SpecialDay_Grenade_Begin()
 {
     SetConVarBool(g_FriendlyFire, true);
-
+    RemoveAllWeapons();
     for (int i = 1; i <= MaxClients; i++)
     {
 
@@ -30,9 +30,6 @@ public void Grenade_OnEntityCreated(int entity, const char[] classname)
 public Action Timer_GiveGrenade(Handle timer, any entity)
 {
     int client = GetEntPropEnt(entity, Prop_Data, "m_hOwnerEntity");
-
-    if (IsValidEntity(entity))
-        AcceptEntityInput(entity, "Kill");
 
     if (IsValidClient(client) && IsPlayerAlive(client))
     {

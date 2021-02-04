@@ -1,6 +1,7 @@
 public void SpecialDay_Headshot_Begin()
 {
     SetConVarBool(g_FriendlyFire, true);
+    RemoveAllWeapons();
 
     for (int i = 1; i <= MaxClients; i++)
     {
@@ -29,10 +30,9 @@ public Action Headshot_OnPlayerHurt(Handle event, const char[] name, bool dontBr
     if (hitgroup != 1)
     {
         int victim = GetClientOfUserId(GetEventInt(event, "userid"));
-
         if (IsValidClient(victim))
         {
-            SetEntProp(victim, Prop_Send, "m_iHealth", (health + damageToHealth), 4, true);
+            SetEntProp(victim, Prop_Send, "m_iHealth", (health + damageToHealth), 4);
         }
     }
 }

@@ -1,6 +1,7 @@
 public void SpecialDay_Dodgeball_Begin()
 {
     SetConVarBool(g_FriendlyFire, true);
+    RemoveAllWeapons();
 
     for (int i = 1; i <= MaxClients; i++)
     {
@@ -17,7 +18,18 @@ public void SpecialDay_Dodgeball_Begin()
 
 public void SpecialDay_Dodgeball_End()
 {
+
     SetConVarBool(g_FriendlyFire, false);
+
+    for (int i = 1; i <= MaxClients; i++)
+    {   
+        if (IsValidClient(i))
+        {
+            PrintToChatAll("Setting %N's gravity", i);
+            SetEntityGravity(i, 1.0);            
+        }
+    }
+
 }
 
 public Action Dodgeball_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)
@@ -44,7 +56,6 @@ public Action Timer_GiveFlash(Handle timer, any entity)
         StripAllWeapons(client);
         GivePlayerItem(client, "weapon_flashbang");
         SetEntityHealth(client, 1);  
-        // Just incase it got messed up on a ladder somehow
-        SetEntityGravity(client, 0.6);
+
     }
 }
