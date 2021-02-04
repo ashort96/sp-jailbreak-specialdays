@@ -28,6 +28,14 @@ public void SpecialDay_Zombie_Begin()
 public void SpecialDay_Zombie_End()
 {
     RestoreTeams();
+
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i))
+        {
+            SetEntityGravity(i, 1.0);
+        }
+    }
 }
 
 public void Zombie_OnMapStart()
@@ -214,7 +222,7 @@ public Action Zombie_OnTakeDamage(int victim, int &attacker, int &inflictor, flo
     }
 
     return Plugin_Changed;
-    
+
 }
 
 public Action Timer_ZombieRevive(Handle timer, int client)
