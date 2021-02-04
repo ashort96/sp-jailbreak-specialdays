@@ -22,15 +22,14 @@
 #include "specialdays/headshot.sp"
 #include "specialdays/juggernaut.sp"
 #include "specialdays/knife.sp"
+#include "specialdays/tank.sp"
+#include "specialdays/scoutknives.sp"
 
 typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
 FunctionPointer SpecialDay_End;
 
-SpecialDay g_SpecialDay;
-SpecialDayState g_SpecialDayState;
-
-int g_RoundsUntilWardenSpecialDay = 50;
+int g_RoundsUntilWardenSpecialDay = 51;
 int g_Countdown;
 
 Menu g_GunMenu;
@@ -61,6 +60,7 @@ public void OnPluginStart()
     }
 
     // Regular Commands
+    RegConsoleCmd("jointeam", Command_JoinTeam);
     RegConsoleCmd("sm_wsd", Command_WardenSpecialDay);
 
     // Admin Commands
@@ -93,6 +93,19 @@ public void OnClientPutInServer(int client)
 ///////////////////////////////////////////////////////////////////////////////
 // Admin Commands
 ///////////////////////////////////////////////////////////////////////////////
+public Action Command_JoinTeam(int client, int args)
+{
+    if (g_SpecialDayState == inactive)
+        return;
+    
+    switch(g_SpecialDay)
+    {
+        case tank: { Tank_JoinTeam(client, args); }
+        default: {}
+    } 
+
+}
+
 public Action Command_SpecialDay(int client, int args)
 {
     Callback_SpecialDay(client);
@@ -115,6 +128,8 @@ public Action Command_WardenSpecialDay(int client, int args)
         PrintToChat(client, "%s You must wait %d more rounds until calling a Warden Special Day!", SD_PREFIX, g_RoundsUntilWardenSpecialDay);
         return Plugin_Handled;
     }
+
+    g_RoundsUntilWardenSpecialDay = 51;
 
     Callback_SpecialDay(client);
     return Plugin_Handled;
@@ -174,6 +189,7 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
     {
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
         case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
+        case scoutknives: { Scoutknives_OnPlayerDeath(event, name, dontBroadcast); }
         default: {}
     }
 
@@ -326,6 +342,17 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
                 SpecialDay_Begin = SpecialDay_Knife_Begin;
                 SpecialDay_End = SpecialDay_Knife_End;
             }
+            case tank:
+            {
+                DisplayGunMenuToAll();
+                SpecialDay_Begin = SpecialDay_Tank_Begin;
+                SpecialDay_End = SpecialDay_Tank_End; 
+            }
+            case scoutknives:
+            {
+                SpecialDay_Begin = SpecialDay_Scoutknives_Begin;
+                SpecialDay_End = SpecialDay_Scoutknives_End;
+            }
         }
         g_Countdown = SD_DELAY;
         CreateTimer(1.0, Timer_SpecialDay, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -353,8 +380,6 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
 
         StripAllWeapons(param1);
         
-        PrintToChatAll("Giving %N knife and deagle - selected %s", param1, primary);
-
         GivePlayerItem(param1, "weapon_knife");
         GivePlayerItem(param1, "weapon_deagle");
 

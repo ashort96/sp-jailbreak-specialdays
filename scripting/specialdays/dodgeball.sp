@@ -25,7 +25,6 @@ public void SpecialDay_Dodgeball_End()
     {   
         if (IsValidClient(i))
         {
-            PrintToChatAll("Setting %N's gravity", i);
             SetEntityGravity(i, 1.0);            
         }
     }

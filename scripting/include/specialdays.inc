@@ -5,6 +5,8 @@ Handle g_FriendlyFire;
 
 int g_WeaponParent;
 
+int g_Teams[MAXPLAYERS] = {-1, ...};
+
 enum SpecialDay 
 {
     deathMatch,
@@ -15,15 +17,25 @@ enum SpecialDay
     headshot,
     juggernaut,
     knife,
-    // scoutknives,
+    scoutknives,
     // skyWars,
     // spectre,
-    // tank,
+    tank,
     // zombie,
     normal
 };
 
-const int SD_LIST_SIZE = 7;
+enum SpecialDayState 
+{
+    started,
+    active,
+    inactive
+};
+
+SpecialDay g_SpecialDay;
+SpecialDayState g_SpecialDayState;
+
+const int SD_LIST_SIZE = 9;
 
 char SD_LIST[][] = 
 {
@@ -36,19 +48,14 @@ char SD_LIST[][] =
     // "Hide and Seek",
     "Juggernaut",
     "Knife",
-    // "Scoutknives",
+    "Scoutknives",
     // "Sky Wars",
     // "Spectre",
-    // "Tank",
+    "Tank",
     // "Zombie",
 };
 
-enum SpecialDayState 
-{
-    started,
-    active,
-    inactive
-};
+
 
 stock void StripAllWeapons(int client)
 {
@@ -126,4 +133,40 @@ stock void RemoveAllWeapons()
             }
         }
     }
+}
+
+stock void SaveTeams()
+{
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i) && IsPlayerOnTeam(i))
+        {
+            g_Teams[i] = GetClientTeam(i);
+        }
+    }
+}
+
+stock void RestoreTeams()
+{
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i) && IsPlayerOnTeam(i) && g_Teams[i] != -1)
+        {
+            CS_SwitchTeam(i, g_Teams[i]);
+        }
+        g_Teams[i] = -1;
+    }
+}
+
+stock int GetRandomClient()
+{
+    int client;
+    
+    for (;;)
+    {
+        client = GetRandomInt(0, MaxClients);
+        if (IsValidClient(client) && IsPlayerOnTeam(client) && IsPlayerAlive(client))
+            break;
+    }
+    return client;
 }
