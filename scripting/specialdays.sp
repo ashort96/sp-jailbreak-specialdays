@@ -122,6 +122,20 @@ public Action Command_WardenSpecialDay(int client, int args)
         return Plugin_Handled;
     }
 
+    int numberOfPeople;
+
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i))
+            numberOfPeople++;
+    }
+
+    if (numberOfPeople < 4)
+    {
+        PrintToChat(client, "%s At least 4 people are required to call a Warden Special Day!", SD_PREFIX);
+        return Plugin_Handled;
+    }
+
     if (g_RoundsUntilWardenSpecialDay > 0)
     {
         PrintToChat(client, "%s You must wait %d more rounds until calling a Warden Special Day!", SD_PREFIX, g_RoundsUntilWardenSpecialDay);
