@@ -294,7 +294,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 
 public Action OnWeaponEquip(int client, int weapon)
 {
-    if (g_SpecialDayState == inactive)
+    if (g_SpecialDayState != active)
         return Plugin_Continue;
 
     Action returnStatus = Plugin_Continue;
