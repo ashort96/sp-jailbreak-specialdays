@@ -27,6 +27,7 @@ public void SpecialDay_Zombie_Begin()
     PrintCenterTextAll("%N IS PATIENT ZERO!", patientZero);
     EmitSoundToAll("music/hla.mp3");
     AcceptEntityInput(fogEnt, "TurnOn");
+
 }
 
 public void SpecialDay_Zombie_End()
@@ -40,6 +41,8 @@ public void SpecialDay_Zombie_End()
             SetEntityGravity(i, 1.0);
         }
     }
+
+    AcceptEntityInput(fogEnt, "TurnOff");
 }
 
 public void Zombie_OnMapStart()
@@ -103,18 +106,16 @@ public void Zombie_OnMapStart()
         DispatchSpawn(fogEnt);
     }
 
-    if (fogEnt != -1)
-    {
-		DispatchKeyValue(fogEnt, "fogblend", "0");
-		DispatchKeyValue(fogEnt, "fogcolor", "0 0 0");
-		DispatchKeyValue(fogEnt, "fogcolor2", "0 0 0");
-		DispatchKeyValueFloat(fogEnt, "fogstart", 350.0);
-		DispatchKeyValueFloat(fogEnt, "fogend", 750.0);
-		DispatchKeyValueFloat(fogEnt, "fogmaxdensity", 50.0);        
-    }
+
+    DispatchKeyValue(fogEnt, "fogblend", "0");
+    DispatchKeyValue(fogEnt, "fogcolor", "0 0 0");
+    DispatchKeyValue(fogEnt, "fogcolor2", "0 0 0");
+    DispatchKeyValueFloat(fogEnt, "fogstart", 350.0);
+    DispatchKeyValueFloat(fogEnt, "fogend", 750.0);
+    DispatchKeyValueFloat(fogEnt, "fogmaxdensity", 50.0);        
+
 
     AcceptEntityInput(fogEnt, "TurnOff");
-
 
 }
 
@@ -226,6 +227,21 @@ public Action Zombie_OnTakeDamage(int victim, int &attacker, int &inflictor, flo
 
     return Plugin_Changed;
 
+}
+
+public Action Zombie_OnWeaponEquip(int client, int weapon)
+{
+    char weaponString[32];
+    GetEdictClassname(weapon, weaponString, sizeof(weaponString));
+
+    if (GetClientTeam(client) == CS_TEAM_T)
+    {
+        if (!StrEqual(weaponString, "weapon_knife"))
+        {
+            return Plugin_Handled;
+        }
+    }
+    return Plugin_Continue;
 }
 
 public Action Timer_ZombieRevive(Handle timer, int client)

@@ -47,7 +47,7 @@ char SD_LIST[][] =
     "Headshot",
     "Juggernaut",
     "Knife",
-    "Scoutknives",
+    "Scoutzknivez",
     // "Sky Wars",
     // "Spectre",
     "Tank",

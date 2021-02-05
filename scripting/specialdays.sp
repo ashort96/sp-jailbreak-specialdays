@@ -47,12 +47,6 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-    // Verify that the jailbreak plugin is running
-    // bool pluginJailbreakExists = LibraryExists("jailbreak");
-    // if (!pluginJailbreakExists)
-    // {
-    //     SetFailState("This plugin requires jailbreak.smx to be running");
-    // }
 
     // Verify that we are on CS:S
     EngineVersion game = GetEngineVersion();
@@ -93,6 +87,7 @@ public void OnMapEnd()
 public void OnClientPutInServer(int client)
 {
     SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
+    SDKHook(client, SDKHook_WeaponEquip, OnWeaponEquip);
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Admin Commands
@@ -147,9 +142,6 @@ public void OnEntityCreated(int entity, const char[] classname)
     if (g_SpecialDayState == inactive)
         return;
 
-    // If the SpecialDay needs to hook into OnEntityCreated(), do so here following this format:
-    // case SpecialDay: { SpecialDay_OnEntityCreated(entity, classname); }
-
     switch(g_SpecialDay)
     {
         case dodgeball: { Dodgeball_OnEntityCreated(entity, classname); }
@@ -181,12 +173,17 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
     }
 
     int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+    int victim = GetClientOfUserId(GetEventInt(event, "userid"));
 
     // If friendly fire is enabled, we still want to give the person a frag
     if (GetConVarBool(g_FriendlyFire))
     {
-        int frags = GetEntProp(attacker, Prop_Data, "m_iFrags");
-        SetEntProp(attacker, Prop_Data, "m_iFrags", frags + 2);
+        if (GetClientTeam(attacker) == GetClientTeam(victim))
+        {
+            int frags = GetEntProp(attacker, Prop_Data, "m_iFrags");
+            SetEntProp(attacker, Prop_Data, "m_iFrags", frags + 2);
+        }
+
     }
 
     switch (g_SpecialDay)
@@ -271,13 +268,27 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 
     // If the SpecialDay needs to hook into OnTakeDamage(), do so here following this format:
     // case SpecialDay: { returnStatus = SpecialDay_OnTakeDamage(victim, attacker, inflictor, damage, damgetype); }
-    switch(g_SpecialDay)
+    switch (g_SpecialDay)
     {
         case dodgeball: { returnStatus = Dodgeball_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
         case zombie: { returnStatus = Zombie_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
         default: {}
     }
 
+    return returnStatus;
+}
+
+public Action OnWeaponEquip(int client, int weapon)
+{
+    if (g_SpecialDayState == inactive)
+        return Plugin_Continue;
+
+    Action returnStatus = Plugin_Continue;
+
+    switch (g_SpecialDay)
+    {
+        case zombie: { returnStatus = Zombie_OnWeaponEquip(client, weapon); }
+    }
     return returnStatus;
 }
 
@@ -313,11 +324,43 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
         PrintToChatAll("%s %s Special Day selected!", SD_PREFIX, SD_LIST[param2]);
         LogAction(param1, -1, "%N Started Special Day %s", param1, SD_LIST[param2]);
 
+        RemoveWarden();
         DisableWarden();
         DisableWardenHud();
 
         g_SpecialDayState = started;
         g_SpecialDay = view_as<SpecialDay>(param2);
+
+        // Open all the doors
+        char openEntityList[][] = {
+            "func_door",
+            "func_movelinear",
+            "func_door_rotating",
+            "prop_door_rotating"
+        };
+
+        int entity;
+
+        for (int i = 0; i < sizeof(openEntityList); i++)
+        {
+            while ((entity = FindEntityByClassname(entity, openEntityList[i])) != -1)
+            {
+                if (IsValidEntity(entity))
+                {
+                    AcceptEntityInput(entity, "Open");
+                }
+            }
+        }
+
+        while ((entity = FindEntityByClassname(entity, "func_breakable")) != -1)
+        {
+            if (IsValidEntity(entity))
+            {
+                AcceptEntityInput(entity, "Break");
+            }
+        }
+
+        CreateTimer(1.0, Timer_SpecialDayHud, param2, TIMER_REPEAT);
 
         for (int i = 1; i <= MaxClients; i++)
         {
@@ -441,6 +484,8 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
 ///////////////////////////////////////////////////////////////////////////////
 public Action Timer_SpecialDay(Handle timer)
 {
+    if (g_SpecialDayState == inactive)
+        return Plugin_Stop;
     if (g_Countdown > 0)
     {
         PrintCenterTextAll("Special Day begins in %i...", g_Countdown);
@@ -456,6 +501,30 @@ public Action Timer_SpecialDay(Handle timer)
         Call_Finish();
         return Plugin_Stop;
     }
+}
+
+public Action Timer_SpecialDayHud(Handle timer, int choice)
+{
+    if (g_SpecialDayState == inactive)
+        return Plugin_Stop;
+    
+    char buf[256];
+
+    Format(buf, sizeof(buf), "SD: %s", SD_LIST[choice]);
+
+    Handle hudText = CreateHudSynchronizer();
+    SetHudTextParams(-1.5, -1.7, 1.0, 255, 255, 255, 255);
+
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (IsValidClient(i))
+        {
+            ShowSyncHudText(i, hudText, buf);
+        }
+    }
+
+    return Plugin_Continue;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

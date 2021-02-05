@@ -73,7 +73,7 @@ public Action Timer_ScoutknivesEnd(Handle timer)
 
     if (IsValidClient(clientIndex))
     {
-        PrintToChatAll("%s %N won Scoutknives!", SD_PREFIX, clientIndex);
+        PrintToChatAll("%s %N won Scoutzknivez!", SD_PREFIX, clientIndex);
     }
     else 
     {
