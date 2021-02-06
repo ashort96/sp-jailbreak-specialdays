@@ -1,3 +1,8 @@
+#if defined _jailbreak_specialdays_included
+    #endinput
+#endif
+#define _jailbreak_specialdays_included
+
 #define SD_PREFIX "\x04[GP Special Days]\x07F8F8FF"
 #define SD_DELAY 19
 
