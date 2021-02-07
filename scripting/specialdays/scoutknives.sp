@@ -7,6 +7,8 @@ public void SpecialDay_Scoutknives_Begin()
         g_ScoutKnivesKills[i] = 0;
     }
 
+    RemoveAllWeapons();
+
     for (int i = 1; i <= MaxClients; i++)
     {
         if (!IsValidClient(i) || !IsPlayerAlive(i))
@@ -44,6 +46,21 @@ public void Scoutknives_OnPlayerDeath(Handle event, const char[] name, bool dont
     int victim = GetClientOfUserId(GetEventInt(event, "userid"));
     CreateTimer(3.0, Timer_ScoutknivesRevive, victim);
     g_ScoutKnivesKills[attacker]++;
+}
+
+public Action Scoutknives_OnWeaponEquip(int client, int weapon)
+{
+    char weaponString[32];
+    GetEdictClassname(weapon, weaponString, sizeof(weaponString));
+
+    if (GetClientTeam(client) == CS_TEAM_T)
+    {
+        if (!(StrEqual(weaponString, "weapon_knife") || StrEqual(weaponString, "weapon_scout")))
+        {
+            return Plugin_Handled;
+        }
+    }
+    return Plugin_Continue;
 }
 
 public Action Timer_ScoutknivesRevive(Handle timer, int client)

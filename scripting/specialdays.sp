@@ -301,6 +301,7 @@ public Action OnWeaponEquip(int client, int weapon)
 
     switch (g_SpecialDay)
     {
+        case scoutknives: { returnStatus = Scoutknives_OnWeaponEquip(client, weapon); }
         case zombie: { returnStatus = Zombie_OnWeaponEquip(client, weapon); }
     }
     return returnStatus;
