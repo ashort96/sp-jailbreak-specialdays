@@ -36,6 +36,7 @@
 #include "specialdays/dodgeball.sp"
 #include "specialdays/friendly_fire.sp"
 #include "specialdays/grenade.sp"
+#include "specialdays/gun_game.sp"
 #include "specialdays/headshot.sp"
 #include "specialdays/juggernaut.sp"
 #include "specialdays/knife.sp"
@@ -219,6 +220,7 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
     switch (g_SpecialDay)
     {
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
+        case gunGame: { GunGame_OnPlayerDeath(event, name, dontBroadcast); }
         case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
         case scoutknives: { Scoutknives_OnPlayerDeath(event, name, dontBroadcast); }
         case zombie: { Zombie_OnPlayerDeath(event, name, dontBroadcast); }
@@ -425,6 +427,11 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
                 SpecialDay_Begin = SpecialDay_Grenade_Begin;
                 SpecialDay_End = SpecialDay_Grenade_End;
             }
+            case gunGame:
+            {
+                SpecialDay_Begin = SpecialDay_GunGame_Begin;
+                SpecialDay_End = SpecialDay_GunGame_End;
+            }
             case headshot:
             {
                 SpecialDay_Begin = SpecialDay_Headshot_Begin;
@@ -564,7 +571,7 @@ public Action Timer_SpecialDayHud(Handle timer, int choice)
 Menu BuildGunMenu(MenuHandler gunMenuHandler)
 {
     const int numGuns = 14;
-    static const char gunDisplay [numGuns][] =
+    static const char gunDisplay[numGuns][] =
     {
         "AK47", "M4A1", "AWP", "M3", "P90", "M249",
         "SCOUT", "MP5", "GALIL", "SG", "TMP", "AUG",
