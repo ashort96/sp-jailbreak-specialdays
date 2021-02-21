@@ -135,9 +135,9 @@ public void Zombie_OnMapStart()
 
 }
 
-public void Zombie_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void Zombie_OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-    int victim = GetClientOfUserId(GetEventInt(event, "userid"));
+    int victim = GetClientOfUserId(event.GetInt("userid"));
 
     if (GetClientTeam(victim) == CS_TEAM_CT)
     {
@@ -178,9 +178,9 @@ public void Zombie_OnPlayerDeath(Handle event, const char[] name, bool dontBroad
 
 }
 
-public void Zombie_OnPlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
+public void Zombie_OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
 {
-    int client = GetClientOfUserId(GetEventInt(event, "userid"));
+    int client = GetClientOfUserId(event.GetInt("userid"));
 
     if (client == patientZero)
     {

@@ -24,9 +24,9 @@ public void SpecialDay_Juggernaut_End()
     SetConVarBool(g_FriendlyFire, false);
 }
 
-public Action Juggernaught_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public Action Juggernaught_OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-    int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
 
     int health = GetClientHealth(attacker);
 

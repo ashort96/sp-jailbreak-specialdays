@@ -60,12 +60,12 @@ public void SpecialDay_GunGame_End()
 
 }
 
-public void GunGame_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
     char weapon[64];
-    int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-    int victim = GetClientOfUserId(GetEventInt(event, "userid"));
-    GetEventString(event, "weapon", weapon, sizeof(weapon));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
+    int victim = GetClientOfUserId(event.GetInt("userid"));
+    event.GetString("weapon", weapon, sizeof(weapon));
 
     // If someone got stabbed, drop them a level
     if (StrEqual(weapon, "weapon_knife"))

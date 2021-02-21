@@ -42,9 +42,9 @@ public void SpecialDay_Tank_End()
     RestoreTeams();
 }
 
-public void Tank_OnPlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
+public void Tank_OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
 {
-    int client = GetClientOfUserId(GetEventInt(event, "userid"));
+    int client = GetClientOfUserId(event.GetInt("userid"));
 
     if (client == tankClient)
     {
