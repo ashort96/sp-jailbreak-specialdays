@@ -70,7 +70,8 @@ public void GunGame_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
     // If someone got stabbed, drop them a level
     if (StrEqual(weapon, "weapon_knife"))
     {
-        g_playerGunLevel[victim]--;
+        if (g_playerGunLevel[victim] > 0)
+            g_playerGunLevel[victim]--;
     }
 
     // Somehow they killed them with a gun they shouldn't have?
