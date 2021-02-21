@@ -5,7 +5,6 @@ This is a refactored version of the plugin [organharvester](https://github.com/d
 ```
 !wsd    Warden Special DAy
 !sd     Special Day (Admin)
-
 ```
 
 ## Licensing
