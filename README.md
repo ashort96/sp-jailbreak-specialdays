@@ -3,7 +3,7 @@ This is a refactored version of the plugin [organharvester](https://github.com/d
 
 ## Commands
 ```
-!wsd    Warden Special DAy
+!wsd    Warden Special Day
 !sd     Special Day (Admin)
 ```
 
