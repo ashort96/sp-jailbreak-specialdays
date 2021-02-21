@@ -37,15 +37,15 @@ public void SpecialDay_Headshot_End()
     SetConVarBool(g_FriendlyFire, false);
 }
 
-public Action Headshot_OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
+public Action Headshot_OnPlayerHurt(Event event, const char[] name, bool dontBroadcast)
 {
-    int hitgroup = GetEventInt(event, "hitgroup");
-    int damageToHealth = GetEventInt(event, "dmg_health");
-    int health = GetEventInt(event, "health");
+    int hitgroup = event.GetInt("hitgroup");
+    int damageToHealth = event.GetInt("dmg_health");
+    int health = event.GetInt("health");
 
     if (hitgroup != 1)
     {
-        int victim = GetClientOfUserId(GetEventInt(event, "userid"));
+        int victim = GetClientOfUserId(event.GetInt("userid"));
         if (IsValidClient(victim))
         {
             SetEntProp(victim, Prop_Send, "m_iHealth", (health + damageToHealth), 4);

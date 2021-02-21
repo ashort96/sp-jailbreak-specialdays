@@ -33,10 +33,11 @@ public void SpecialDay_DeathMatch_End()
 
 }
 
-public void DeathMatch_OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void DeathMatch_OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-    int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-    int victim = GetClientOfUserId(GetEventInt(event, "userid"));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
+    int victim = GetClientOfUserId(event.GetInt("userid"));
+
     CreateTimer(3.0, Timer_DeathMatchRevive, victim);
     g_DeathMatchKills[attacker]++;
 }

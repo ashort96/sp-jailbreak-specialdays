@@ -181,7 +181,7 @@ public void OnEntityCreated(int entity, const char[] classname)
     }
 }
 
-public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
+public Action OnPlayerHurt(Event event, const char[] name, bool dontBroadcast)
 {
     if (g_SpecialDayState == inactive)
     {
@@ -196,15 +196,15 @@ public Action OnPlayerHurt(Handle event, const char[] name, bool dontBroadcast)
 
 }
 
-public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
     if (g_SpecialDayState == inactive)
     {
         return;
     }
 
-    int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-    int victim = GetClientOfUserId(GetEventInt(event, "userid"));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
+    int victim = GetClientOfUserId(event.GetInt("userid"));
 
     // If friendly fire is enabled, we still want to give the person a frag
     if (GetConVarBool(g_FriendlyFire))
@@ -229,7 +229,7 @@ public void OnPlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 
 }
 
-public void OnPlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
+public void OnPlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
 {
     if (g_SpecialDayState == inactive)
     {
@@ -244,7 +244,7 @@ public void OnPlayerDisconnect(Handle event, const char[] name, bool dontBroadca
 }
 
 
-public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
+public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
 
     g_SpecialDay = normal;
@@ -256,7 +256,7 @@ public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast)
         PrintToChatAll("%s A Warden Special Day is available!", SD_PREFIX);
 }
 
-public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
+public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
     // Handle any cleanup here
     if (g_SpecialDayState != inactive)
