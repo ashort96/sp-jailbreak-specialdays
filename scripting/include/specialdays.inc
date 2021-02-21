@@ -34,7 +34,7 @@ enum SpecialDay
     dodgeball,
     friendlyFire,
     grenade,
-    // gunGame,
+    gunGame,
     headshot,
     juggernaut,
     knife,
