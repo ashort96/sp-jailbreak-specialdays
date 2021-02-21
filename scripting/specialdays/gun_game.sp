@@ -68,7 +68,7 @@ public void GunGame_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
     // Game over
     if (g_playerGunLevel[attacker] == g_numRounds)
     {
-        PrintToChatAll("%s %N won!", SD_PREFIX, attacker);
+        PrintToChatAll("%s %N won the SpecialDay!", SD_PREFIX, attacker);
 
         for (int i = 1; i <= MaxClients; i++)
         {
@@ -104,5 +104,6 @@ void GiveClientGunGameGun(int client)
 {
     StripAllWeapons(client);
     GivePlayerItem(client, "weapon_knife");
-    GivePlayerItem(client, g_gunGameNames[g_playerGunLevel[client]]);
+    if (g_playerGunLevel[client] < g_numRounds)
+        GivePlayerItem(client, g_gunGameNames[g_playerGunLevel[client]]);
 }
