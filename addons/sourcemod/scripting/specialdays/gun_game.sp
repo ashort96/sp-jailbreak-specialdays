@@ -74,11 +74,18 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
             g_playerGunLevel[victim]--;
     }
 
+    if (!IsValidClient(attacker))
+    {
+        CreateTimer(3.0, Timer_GunGameRevive, victim);
+        return;
+    }
+
     // Somehow they killed them with a gun they shouldn't have?
     else if (!StrEqual(weapon, g_gunGameNames[g_playerGunLevel[attacker]]))
     {
         GiveClientGunGameGun(attacker);
         PrintToChat(attacker, "%s Don't use outside weapons", SD_PREFIX);
+        CreateTimer(3.0, Timer_GunGameRevive, victim);
         return;
     }
 
