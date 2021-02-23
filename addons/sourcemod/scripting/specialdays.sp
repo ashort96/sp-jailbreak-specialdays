@@ -522,6 +522,16 @@ public int MenuHandler_Weapon(Menu menu, MenuAction action, int param1, int para
 ///////////////////////////////////////////////////////////////////////////////
 public Action Timer_SpecialDay(Handle timer)
 {
+
+#if defined DEBUG
+    PrintToChatAll("%s Special day started!", SD_PREFIX);
+    PrintCenterTextAll("Special day started!");
+    g_SpecialDayState = active;
+    Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
+    Call_Finish();
+    return Plugin_Stop;
+#endif
+
     if (g_SpecialDayState == inactive)
         return Plugin_Stop;
     if (g_Countdown > 0)
