@@ -68,7 +68,7 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
     event.GetString("weapon", weapon, sizeof(weapon));
 
     // If someone got stabbed, drop them a level
-    if (StrEqual(weapon, "weapon_knife"))
+    if (StrContains("weapon_knife", weapon) != -1)
     {
         if (g_playerGunLevel[victim] > 0)
             g_playerGunLevel[victim]--;
@@ -81,7 +81,7 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
     }
 
     // Somehow they killed them with a gun they shouldn't have?
-    else if (!StrEqual(weapon, g_gunGameNames[g_playerGunLevel[attacker]]))
+    else if (StrContains(g_gunGameNames[g_playerGunLevel[attacker]], weapon) == -1)
     {
         GiveClientGunGameGun(attacker);
         PrintToChat(attacker, "%s Don't use outside weapons", SD_PREFIX);
