@@ -67,17 +67,18 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
     int victim = GetClientOfUserId(event.GetInt("userid"));
     event.GetString("weapon", weapon, sizeof(weapon));
 
+    // If they got killed by someone other than a valid client
+    if (!IsValidClient(attacker))
+    {
+        CreateTimer(3.0, Timer_GunGameRevive, victim);
+        return;
+    }
+
     // If someone got stabbed, drop them a level
     if (StrContains("weapon_knife", weapon) != -1)
     {
         if (g_playerGunLevel[victim] > 0)
             g_playerGunLevel[victim]--;
-    }
-
-    if (!IsValidClient(attacker))
-    {
-        CreateTimer(3.0, Timer_GunGameRevive, victim);
-        return;
     }
 
     // Somehow they killed them with a gun they shouldn't have?
@@ -88,6 +89,9 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
         CreateTimer(3.0, Timer_GunGameRevive, victim);
         return;
     }
+
+    g_playerGunLevel[attacker]++;
+
 
     // Game over
     if (g_playerGunLevel[attacker] == g_numRounds)
@@ -102,7 +106,6 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
         return;
     }
 
-    g_playerGunLevel[attacker]++;
     GiveClientGunGameGun(attacker);
 
     CreateTimer(3.0, Timer_GunGameRevive, victim);
