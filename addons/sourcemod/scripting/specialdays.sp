@@ -49,7 +49,11 @@ typedef FunctionPointer = function void ();
 FunctionPointer SpecialDay_Begin;
 FunctionPointer SpecialDay_End;
 
-int g_RoundsUntilWardenSpecialDay = 51;
+ConVar g_ConVarPrefix;
+ConVar g_ConVarDelay;
+ConVar g_ConVarCooldown;
+
+int g_Cooldown;
 int g_Countdown;
 
 Menu g_GunMenu;
@@ -89,6 +93,25 @@ public void OnPluginStart()
 
     g_FriendlyFire = FindConVar("mp_friendlyfire");
     g_WeaponParent = FindSendPropInfo("CBaseCombatWeapon", "m_hOwnerEntity");
+
+    g_ConVarPrefix = CreateConVar("sm_specialdays_prefix", "[Special Days]", "Prefix for messages from the plugin");
+    g_ConVarPrefix.AddChangeHook(OnPrefixChange);
+    g_ConVarDelay = CreateConVar("sm_specialday_delay", "20", "Time before Special Day starts", 0, true, 0.0);
+    g_ConVarDelay.AddChangeHook(OnDelayChange);
+    g_ConVarCooldown = CreateConVar("sm_specialdays_cooldown", "50", "Number of rounds before another Warden Special Day", 0, true, 0.0);
+    g_ConVarCooldown.AddChangeHook(OnCooldownChange);
+
+    char tmpbuffer[32];
+    g_ConVarPrefix.GetString(tmpbuffer, sizeof(tmpbuffer));
+    Format(g_Prefix, sizeof(g_Prefix), "\x04%s\x07F8F8FF", tmpbuffer);
+
+    g_Delay = g_ConVarDelay.IntValue - 1;
+
+    g_Cooldown = g_ConVarCooldown.IntValue;
+
+
+    AutoExecConfig(true);
+
 }
 
 public void OnMapStart()
@@ -107,6 +130,25 @@ public void OnClientPutInServer(int client)
     SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
     SDKHook(client, SDKHook_WeaponEquip, OnWeaponEquip);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// ConVar Changes
+///////////////////////////////////////////////////////////////////////////////
+public void OnPrefixChange(ConVar convar, char[] oldValue, char[] newValue)
+{
+    Format(g_Prefix, sizeof(g_Prefix), "\x04%s\x07F8F8FF", newValue);
+}
+
+public void OnDelayChange(ConVar convar, char[] oldValue, char[] newValue)
+{
+    g_Delay = g_ConVarDelay.IntValue - 1;
+}
+
+public void OnCooldownChange(ConVar convar, char[] oldValue, char[] newValue)
+{
+    g_Cooldown = g_ConVarCooldown.IntValue;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Admin Commands
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +178,7 @@ public Action Command_WardenSpecialDay(int client, int args)
 {
     if (client != GetWardenID())
     {
-        PrintToChat(client, "%s Only the Warden can use a Warden Special Day!", SD_PREFIX);
+        PrintToChat(client, "%s Only the Warden can use a Warden Special Day!", g_Prefix);
         return Plugin_Handled;
     }
 
@@ -150,17 +192,17 @@ public Action Command_WardenSpecialDay(int client, int args)
 
     if (numberOfPeople < 4)
     {
-        PrintToChat(client, "%s At least 4 people are required to call a Warden Special Day!", SD_PREFIX);
+        PrintToChat(client, "%s At least 4 people are required to call a Warden Special Day!", g_Prefix);
         return Plugin_Handled;
     }
 
-    if (g_RoundsUntilWardenSpecialDay > 0)
+    if (g_Cooldown > 0)
     {
-        PrintToChat(client, "%s You must wait %d more rounds until calling a Warden Special Day!", SD_PREFIX, g_RoundsUntilWardenSpecialDay);
+        PrintToChat(client, "%s You must wait %d more rounds until calling a Warden Special Day!", g_Prefix, g_Cooldown);
         return Plugin_Handled;
     }
 
-    g_RoundsUntilWardenSpecialDay = 51;
+    g_Cooldown = 51;
 
     Callback_SpecialDay(client);
     return Plugin_Handled;
@@ -253,10 +295,10 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
     g_SpecialDay = normal;
     g_SpecialDayState = inactive;
 
-    if (g_RoundsUntilWardenSpecialDay > 0)
-        g_RoundsUntilWardenSpecialDay--;
+    if (g_Cooldown > 0)
+        g_Cooldown--;
     else 
-        PrintToChatAll("%s A Warden Special Day is available!", SD_PREFIX);
+        PrintToChatAll("%s A Warden Special Day is available!", g_Prefix);
 }
 
 public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
@@ -264,7 +306,7 @@ public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
     // Handle any cleanup here
     if (g_SpecialDayState != inactive)
     {
-        PrintToChatAll("%s Special day is over!", SD_PREFIX);
+        PrintToChatAll("%s Special day is over!", g_Prefix);
         EnableWarden();
         EnableWardenHud();
         Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
@@ -336,7 +378,7 @@ void Callback_SpecialDay(int client)
 {
     if (g_SpecialDayState != inactive)
     {
-        PrintToChat(client, "%s A Special Day has already been called!", SD_PREFIX);
+        PrintToChat(client, "%s A Special Day has already been called!", g_Prefix);
         return;
     }
     Menu specialDayMenu = new Menu(MenuHandler_SpecialDay);
@@ -358,7 +400,7 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
 {
     if (action == MenuAction_Select)
     {
-        PrintToChatAll("%s %s Special Day selected!", SD_PREFIX, SD_LIST[param2]);
+        PrintToChatAll("%s %s Special Day selected!", g_Prefix, SD_LIST[param2]);
         LogAction(param1, -1, "%N Started Special Day %s", param1, SD_LIST[param2]);
 
         RemoveWarden();
@@ -475,7 +517,7 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
                 SpecialDay_End = SpecialDay_Zombie_End;
             }
         }
-        g_Countdown = SD_DELAY;
+        g_Countdown = g_Delay;
         CreateTimer(1.0, Timer_SpecialDay, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
     }
     else if (action == MenuAction_Cancel)
@@ -533,7 +575,7 @@ public Action Timer_SpecialDay(Handle timer)
 {
 
 #if defined DEBUG
-    PrintToChatAll("%s Special day started!", SD_PREFIX);
+    PrintToChatAll("%s Special day started!", g_Prefix);
     PrintCenterTextAll("Special day started!");
     g_SpecialDayState = active;
     Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
@@ -551,7 +593,7 @@ public Action Timer_SpecialDay(Handle timer)
     }
     else
     {
-        PrintToChatAll("%s Special day started!", SD_PREFIX);
+        PrintToChatAll("%s Special day started!", g_Prefix);
         PrintCenterTextAll("Special day started!");
         g_SpecialDayState = active;
         Call_StartFunction(INVALID_HANDLE, SpecialDay_Begin);
@@ -620,7 +662,7 @@ void DisplayGunMenu(int client)
 
 void DisplayGunMenuToAll()
 {
-    PrintToChatAll("%s Please select a primary for the special day", SD_PREFIX);
+    PrintToChatAll("%s Please select a primary for the special day", g_Prefix);
 
     for (int i = 1; i <= MaxClients; i++)
     {

@@ -107,11 +107,11 @@ public Action Timer_ScoutknivesEnd(Handle timer)
 
     if (IsValidClient(clientIndex))
     {
-        PrintToChatAll("%s %N won Scoutzknivez!", SD_PREFIX, clientIndex);
+        PrintToChatAll("%s %N won Scoutzknivez!", g_Prefix, clientIndex);
     }
     else 
     {
-        PrintToChatAll("%s The winner left the game!", SD_PREFIX);
+        PrintToChatAll("%s The winner left the game!", g_Prefix);
     }
 
     for (int i = 1; i <= MaxClients; i++)
