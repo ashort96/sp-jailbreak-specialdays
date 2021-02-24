@@ -106,6 +106,8 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
         return;
     }
 
+    PrintToChat(attacker, "%s Level %d/%d", SD_PREFIX, g_playerGunLevel[attacker] + 1, g_numRounds);
+
     GiveClientGunGameGun(attacker);
 
     CreateTimer(3.0, Timer_GunGameRevive, victim);
@@ -125,6 +127,23 @@ public Action Timer_GunGameRevive(Handle timer, int client)
     }
 
     return Plugin_Handled;
+}
+
+public void GunGame_OnEntityCreated(int entity, const char[] classname)
+{
+    if (StrEqual(classname, "hegrenade_projectile"))
+        CreateTimer(1.4, GunGame_GiveGrenade, entity);
+}
+
+public Action GunGame_GiveGrenade(Handle timer, any entity)
+{
+    int client = GetEntPropEnt(entity, Prop_Data, "m_hOwnerEntity");
+
+    if (IsValidClient(client) && IsPlayerAlive(client))
+    {
+        StripAllWeapons(client);
+        GivePlayerItem(client, "weapon_hegrenade");
+    }
 }
 
 void GiveClientGunGameGun(int client)
