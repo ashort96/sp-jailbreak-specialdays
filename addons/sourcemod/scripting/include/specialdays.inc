@@ -40,7 +40,7 @@ enum SpecialDay
     headshot,
     juggernaut,
     knife,
-    one_in_chamber,
+    oneInChamber,
     scoutknives,
     // skyWars,
     // spectre,
