@@ -19,7 +19,7 @@
 #define PLUGIN_NAME         "CS:S Jailbreak Special Days"
 #define PLUGIN_AUTHOR       "organharvester, Jordi, Dunder"
 #define PLUGIN_DESCRIPTION  "Jailbreak Special Days"
-#define PLUGIN_VERSION      "4.2"
+#define PLUGIN_VERSION      "4.3"
 #define PLUGIN_URL          "https://github.com/ashort96/sp-jailbreak-specialdays"
 
 #include <cstrike>
