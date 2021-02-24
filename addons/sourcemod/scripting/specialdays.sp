@@ -40,6 +40,7 @@
 #include "specialdays/headshot.sp"
 #include "specialdays/juggernaut.sp"
 #include "specialdays/knife.sp"
+#include "specialdays/one_in_chamber.sp"
 #include "specialdays/tank.sp"
 #include "specialdays/scoutknives.sp"
 #include "specialdays/zombie.sp"
@@ -222,6 +223,7 @@ public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
         case deathMatch: { DeathMatch_OnPlayerDeath(event, name, dontBroadcast);  }
         case gunGame: { GunGame_OnPlayerDeath(event, name, dontBroadcast); }
         case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
+        case one_in_chamber: { One_In_Chamber_OnPlayerDeath(event, name, dontBroadcast); }
         case scoutknives: { Scoutknives_OnPlayerDeath(event, name, dontBroadcast); }
         case zombie: { Zombie_OnPlayerDeath(event, name, dontBroadcast); }
         default: {}
@@ -267,7 +269,7 @@ public void OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
         Call_StartFunction(INVALID_HANDLE, SpecialDay_End);
         Call_Finish();
     }
-
+    
     g_SpecialDay = normal;
     g_SpecialDayState = inactive;
 }
@@ -303,6 +305,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
     switch (g_SpecialDay)
     {
         case dodgeball: { returnStatus = Dodgeball_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
+        case one_in_chamber: { returnStatus = One_In_Chamber_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
         case zombie: { returnStatus = Zombie_OnTakeDamage(victim, attacker, inflictor, damage, damagetype); }
         default: {}
     }
@@ -447,6 +450,11 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             {
                 SpecialDay_Begin = SpecialDay_Knife_Begin;
                 SpecialDay_End = SpecialDay_Knife_End;
+            }
+            case one_in_chamber:
+            {
+                SpecialDay_Begin = SpecialDay_One_In_Chamber_Begin;
+                SpecialDay_End = SpecialDay_One_In_Chamber_End;
             }
             case tank:
             {
