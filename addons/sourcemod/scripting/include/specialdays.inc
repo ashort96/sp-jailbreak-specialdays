@@ -40,6 +40,7 @@ enum SpecialDay
     headshot,
     juggernaut,
     knife,
+    one_in_chamber,
     scoutknives,
     // skyWars,
     // spectre,
@@ -58,7 +59,7 @@ enum SpecialDayState
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
 
-const int SD_LIST_SIZE = 11;
+const int SD_LIST_SIZE = 12;
 
 char SD_LIST[][] = 
 {
@@ -70,6 +71,7 @@ char SD_LIST[][] =
     "Headshot",
     "Juggernaut",
     "Knife",
+    "One In The Chamber",
     "Scoutzknivez",
     // "Sky Wars",
     // "Spectre",
