@@ -85,7 +85,7 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
     else if (StrContains(g_gunGameNames[g_playerGunLevel[attacker]], weapon) == -1)
     {
         GiveClientGunGameGun(attacker);
-        PrintToChat(attacker, "%s Don't use outside weapons", SD_PREFIX);
+        PrintToChat(attacker, "%s Don't use outside weapons", g_Prefix);
         CreateTimer(3.0, Timer_GunGameRevive, victim);
         return;
     }
@@ -96,7 +96,7 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
     // Game over
     if (g_playerGunLevel[attacker] == g_numRounds)
     {
-        PrintToChatAll("%s %N won the SpecialDay!", SD_PREFIX, attacker);
+        PrintToChatAll("%s %N won the SpecialDay!", g_Prefix, attacker);
 
         for (int i = 1; i <= MaxClients; i++)
         {
@@ -106,7 +106,7 @@ public void GunGame_OnPlayerDeath(Event event, const char[] name, bool dontBroad
         return;
     }
 
-    PrintToChat(attacker, "%s Level %d/%d", SD_PREFIX, g_playerGunLevel[attacker] + 1, g_numRounds);
+    PrintToChat(attacker, "%s Level %d/%d", g_Prefix, g_playerGunLevel[attacker] + 1, g_numRounds);
 
     GiveClientGunGameGun(attacker);
 

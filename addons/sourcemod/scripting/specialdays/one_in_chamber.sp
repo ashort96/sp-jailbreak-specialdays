@@ -47,7 +47,7 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
 
     if (g_playerLives[victim] <= 0)
     {
-        PrintToChat(victim, "%s You are out of lives", SD_PREFIX);
+        PrintToChat(victim, "%s You are out of lives", g_Prefix);
         return;
     }
 
@@ -62,13 +62,13 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
 
     if (GetNumAlivePlayers() == 1)
     {
-        PrintToChatAll("%s %N won the Special Day!", SD_PREFIX, attacker);
+        PrintToChatAll("%s %N won the Special Day!", g_Prefix, attacker);
         CS_TerminateRound(5.0, CSRoundEnd_Draw, true);
         return;
     }
 
     CreateTimer(1.0, Timer_OneInChamber_Revive, victim);
-    PrintToChat(victim, "%s You have %i live(s) left", SD_PREFIX, g_playerLives[victim]);
+    PrintToChat(victim, "%s You have %i live(s) left", g_Prefix, g_playerLives[victim]);
 }
 
 public Action OneInChamber_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)

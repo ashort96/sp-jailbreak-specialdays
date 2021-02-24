@@ -64,11 +64,11 @@ public Action Timer_DeathMatchEnd(Handle timer)
     int clientIndex = GetMaximumIndexFromArray(g_DeathMatchKills, sizeof(g_DeathMatchKills));
     if (IsValidClient(clientIndex))
     {
-        PrintToChatAll("%s %N won the Death Match!", SD_PREFIX, clientIndex);
+        PrintToChatAll("%s %N won the Death Match!", g_Prefix, clientIndex);
     }
     else 
     {
-        PrintToChatAll("%s The winner left the game!", SD_PREFIX);
+        PrintToChatAll("%s The winner left the game!", g_Prefix);
     }
 
     // Slay everyone but the person that won
