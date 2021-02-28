@@ -59,7 +59,7 @@ enum SpecialDayState
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
 
-const int SD_LIST_SIZE = 12;
+const int SD_LIST_SIZE = 13;
 
 char SD_LIST[][] = 
 {
