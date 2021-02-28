@@ -43,6 +43,7 @@
 #include "specialdays/one_in_chamber.sp"
 #include "specialdays/tank.sp"
 #include "specialdays/scoutknives.sp"
+#include "specialdays/sky_wars.sp"
 #include "specialdays/zombie.sp"
 
 typedef FunctionPointer = function void ();
@@ -509,6 +510,11 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             {
                 SpecialDay_Begin = SpecialDay_Scoutknives_Begin;
                 SpecialDay_End = SpecialDay_Scoutknives_End;
+            }
+            case skyWars:
+            {
+                SpecialDay_Begin = SpecialDay_SkyWars_Begin;
+                SpecialDay_End = SpecialDay_SkyWars_End;
             }
             case zombie:
             {
