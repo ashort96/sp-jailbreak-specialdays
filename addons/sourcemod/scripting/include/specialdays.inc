@@ -21,7 +21,7 @@
 
 // #define DEBUG
 
-char g_Prefix[64];
+char g_SDPrefix[64];
 int g_Delay;
 
 Handle g_FriendlyFire;
@@ -42,7 +42,7 @@ enum SpecialDay
     knife,
     oneInChamber,
     scoutknives,
-    // skyWars,
+    skyWars,
     // spectre,
     tank,
     zombie,
@@ -59,7 +59,7 @@ enum SpecialDayState
 SpecialDay g_SpecialDay;
 SpecialDayState g_SpecialDayState;
 
-const int SD_LIST_SIZE = 12;
+const int SD_LIST_SIZE = 13;
 
 char SD_LIST[][] = 
 {
@@ -73,7 +73,7 @@ char SD_LIST[][] =
     "Knife",
     "One In The Chamber",
     "Scoutzknivez",
-    // "Sky Wars",
+    "Sky Wars",
     // "Spectre",
     "Tank",
     "Zombie",
