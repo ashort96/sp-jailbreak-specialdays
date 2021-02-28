@@ -21,7 +21,7 @@
 
 // #define DEBUG
 
-char g_Prefix[64];
+char g_SDPrefix[64];
 int g_Delay;
 
 Handle g_FriendlyFire;

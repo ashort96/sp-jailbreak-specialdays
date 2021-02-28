@@ -51,7 +51,7 @@ public void Tank_OnPlayerDisconnect(Event event, const char[] name, bool dontBro
         tankClient = GetRandomClient();
         SetEntityHealth(tankClient, GetClientCount(true) * 250);
         SetEntityRenderColor(tankClient, 255, 0, 0, 255);
-        PrintToChatAll("%s The tank has left the game! %N is the new tank!", g_Prefix, tankClient);
+        PrintToChatAll("%s The tank has left the game! %N is the new tank!", g_SDPrefix, tankClient);
         PrintCenterTextAll("%N IS THE NEW TANK!", tankClient);
         CS_SwitchTeam(tankClient, CS_TEAM_CT);
     }

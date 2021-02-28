@@ -184,7 +184,7 @@ public void Zombie_OnPlayerDisconnect(Event event, const char[] name, bool dontB
 
     if (client == patientZero)
     {
-        PrintToChatAll("%s Patient zero has left the game! Kill the remaining zombies!", g_Prefix);
+        PrintToChatAll("%s Patient zero has left the game! Kill the remaining zombies!", g_SDPrefix);
     }
 }
 
