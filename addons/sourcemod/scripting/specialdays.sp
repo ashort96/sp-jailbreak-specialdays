@@ -41,6 +41,7 @@
 #include "specialdays/juggernaut.sp"
 #include "specialdays/knife.sp"
 #include "specialdays/one_in_chamber.sp"
+#include "specialdays/power_up.sp"
 #include "specialdays/tank.sp"
 #include "specialdays/scoutknives.sp"
 #include "specialdays/sky_wars.sp"
@@ -268,6 +269,7 @@ public void OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
         case gunGame: { GunGame_OnPlayerDeath(event, name, dontBroadcast); }
         case juggernaut: { Juggernaught_OnPlayerDeath(event, name, dontBroadcast); }
         case oneInChamber: { OneInChamber_OnPlayerDeath(event, name, dontBroadcast); }
+        case powerup: { PowerUp_OnPlayerDeath(event, name, dontBroadcast); }
         case scoutknives: { Scoutknives_OnPlayerDeath(event, name, dontBroadcast); }
         case zombie: { Zombie_OnPlayerDeath(event, name, dontBroadcast); }
         default: {}
@@ -499,6 +501,11 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
             {
                 SpecialDay_Begin = SpecialDay_OneInChamber_Begin;
                 SpecialDay_End = SpecialDay_OneInChamber_End;
+            }
+            case powerup:
+            {
+                SpecialDay_Begin = SpecialDay_PowerUp_Begin;
+                SpecialDay_End = SpecialDay_PowerUp_End;
             }
             case tank:
             {
