@@ -23,21 +23,24 @@ public void SpecialDay_PowerUp_Begin()
 {
     SetConVarBool(g_FriendlyFire, true);
     RemoveAllWeapons();
+    
     for(int i = 1; i <= MaxClients; i++)
     {
         if (!IsValidClient(i) || !IsPlayerAlive(i))
             continue; 
         SetEntProp(i, Prop_Data, "m_ArmorValue", 0.0);
+        g_PlayerFrags[i] = 0;
         GiveClientPowerUpItems(i);
     }
 }
 public void SpecialDay_PowerUp_End()
 {
-    for(int i = 1; i<=MaxClients; i++)
+    for(int i = 1; i <= MaxClients; i++)
     {
-        if (!IsValidClient(i) || !IsPlayerAlive(i))
-            continue;
-        PrintToConsoleAll("Player: %N Kills: %i", i, g_PlayerFrags[i]);
+        if (!IsValidClient(i))
+            continue; 
+        PrintToConsoleAll("Player %N | Kills: %i", i, g_PlayerFrags[i]);
+        PrintToConsoleAll("Player %N | Kills: %i", i, g_PlayerFrags[i]);
     }
     SetConVarBool(g_FriendlyFire, false);
 }
@@ -52,12 +55,6 @@ public Action PowerUp_OnPlayerDeath(Event event, const char[] name, bool dontBro
         AcceptEntityInput(weaponvictim, "Kill");
     }
     g_PlayerFrags[attacker]++;
-    if (GetAlivePlayers() == 1)
-    {
-        PrintToChatAll("%s %N won the Special Day!", g_SDPrefix, attacker);
-        CS_TerminateRound(5.0, CSRoundEnd_Draw, true);
-        return;
-    }
     SetSpeed(attacker);
 }
 void GiveClientPowerUpItems(int client)
@@ -79,16 +76,4 @@ void SetSpeed(int client)
         return; 
     }
     SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", g_Speed[g_PlayerFrags[client]]);
-}
-int GetAlivePlayers()
-{
-    int counter = 0;
-    for (int i=1; i<=MaxClients; i++)
-    {
-        if (IsValidClient(i) && IsPlayerAlive(i))
-        {
-            counter++;
-        }
-    }
-    return counter;
 }
