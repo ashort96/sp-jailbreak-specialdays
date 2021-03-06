@@ -40,7 +40,6 @@ public void SpecialDay_PowerUp_End()
         if (!IsValidClient(i))
             continue; 
         PrintToConsoleAll("Player %N | Kills: %i", i, g_PlayerFrags[i]);
-        PrintToConsoleAll("Player %N | Kills: %i", i, g_PlayerFrags[i]);
     }
     SetConVarBool(g_FriendlyFire, false);
 }
