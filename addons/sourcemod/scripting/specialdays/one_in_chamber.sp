@@ -45,17 +45,7 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
 
     g_playerLives[victim]--;
 
-    if (g_playerLives[victim] <= 0)
-    {
-        PrintToChat(victim, "%s You are out of lives", g_SDPrefix);
-        return;
-    }
-
-    if (StrContains(weapon, "knife") != -1)
-    {
-        AddToClip(attacker, 1);
-    }
-    else if (StrContains(weapon, "usp") != -1)
+    if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
     {
         AddToClip(attacker, 1);
     }
@@ -64,6 +54,12 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
     {
         PrintToChatAll("%s %N won the Special Day!", g_SDPrefix, attacker);
         CS_TerminateRound(5.0, CSRoundEnd_Draw, true);
+        return;
+    }
+
+    if (g_playerLives[victim] <= 0)
+    {
+        PrintToChat(victim, "%s You are out of lives", g_SDPrefix);
         return;
     }
 
@@ -81,7 +77,7 @@ public Action OneInChamber_OnTakeDamage(int victim, int &attacker, int &inflicto
     char weapon[32];
     GetClientWeapon(attacker, weapon, sizeof(weapon));
 
-    if ((StrContains(weapon, "knife") != -1)||(StrContains(weapon, "usp") != -1))
+    if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
     { 
         int weaponvictim = GetPlayerWeaponSlot(victim, CS_SLOT_SECONDARY);
 
