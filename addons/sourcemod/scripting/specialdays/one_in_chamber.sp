@@ -43,7 +43,6 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int victim = GetClientOfUserId(event.GetInt("userid"));
     event.GetString("weapon", weapon, sizeof(weapon));
-    PrintToChatAll("Victim: %N Attacker: %N", victim, attacker);
 
     g_playerLives[victim]--;
     if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
