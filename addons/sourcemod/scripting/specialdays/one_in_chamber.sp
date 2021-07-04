@@ -23,6 +23,7 @@ public void SpecialDay_OneInChamber_Begin()
 
     for (int i = 1; i <= MaxClients; i++)
     {
+        g_playerLives[i] = 3;
         if (!IsValidClient(i) || !IsPlayerAlive(i))
             continue; 
 
@@ -42,29 +43,35 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int victim = GetClientOfUserId(event.GetInt("userid"));
     event.GetString("weapon", weapon, sizeof(weapon));
+    PrintToChatAll("Victim: %N Attacker: %N", victim, attacker);
 
     g_playerLives[victim]--;
-
     if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
     {
-        AddToClip(attacker, 1);
+        if (IsValidClient(attacker))
+        {
+            //In the case of a slay
+            if(IsPlayerAlive(attacker))
+            {
+                AddToClip(attacker, 1);
+            }
+        }
     }
-
     if (GetNumAlivePlayers() == 1)
     {
         PrintToChatAll("%s %N won the Special Day!", g_SDPrefix, attacker);
         CS_TerminateRound(5.0, CSRoundEnd_Draw, true);
         return;
     }
-
     if (g_playerLives[victim] <= 0)
     {
         PrintToChat(victim, "%s You are out of lives", g_SDPrefix);
-        return;
     }
-
-    CreateTimer(1.0, Timer_OneInChamber_Revive, victim);
-    PrintToChat(victim, "%s You have %i live(s) left", g_SDPrefix, g_playerLives[victim]);
+    else
+    {
+        CreateTimer(1.0, Timer_OneInChamber_Revive, victim);
+        PrintToChat(victim, "%s You have %i live(s) left", g_SDPrefix, g_playerLives[victim]);
+    }
 }
 
 public Action OneInChamber_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)
