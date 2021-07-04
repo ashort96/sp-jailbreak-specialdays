@@ -23,6 +23,7 @@ public void SpecialDay_OneInChamber_Begin()
 
     for (int i = 1; i <= MaxClients; i++)
     {
+        g_playerLives[i] = 3;
         if (!IsValidClient(i) || !IsPlayerAlive(i))
             continue; 
 
@@ -44,31 +45,32 @@ public void OneInChamber_OnPlayerDeath(Event event, const char[] name, bool dont
     event.GetString("weapon", weapon, sizeof(weapon));
 
     g_playerLives[victim]--;
-
-    if (g_playerLives[victim] <= 0)
+    if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
     {
-        PrintToChat(victim, "%s You are out of lives", g_SDPrefix);
-        return;
+        if (IsValidClient(attacker))
+        {
+            //In the case of a slay
+            if(IsPlayerAlive(attacker))
+            {
+                AddToClip(attacker, 1);
+            }
+        }
     }
-
-    if (StrContains(weapon, "knife") != -1)
-    {
-        AddToClip(attacker, 1);
-    }
-    else if (StrContains(weapon, "usp") != -1)
-    {
-        AddToClip(attacker, 1);
-    }
-
     if (GetNumAlivePlayers() == 1)
     {
         PrintToChatAll("%s %N won the Special Day!", g_SDPrefix, attacker);
         CS_TerminateRound(5.0, CSRoundEnd_Draw, true);
         return;
     }
-
-    CreateTimer(1.0, Timer_OneInChamber_Revive, victim);
-    PrintToChat(victim, "%s You have %i live(s) left", g_SDPrefix, g_playerLives[victim]);
+    if (g_playerLives[victim] <= 0)
+    {
+        PrintToChat(victim, "%s You are out of lives", g_SDPrefix);
+    }
+    else
+    {
+        CreateTimer(1.0, Timer_OneInChamber_Revive, victim);
+        PrintToChat(victim, "%s You have %i live(s) left", g_SDPrefix, g_playerLives[victim]);
+    }
 }
 
 public Action OneInChamber_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype)
@@ -81,7 +83,7 @@ public Action OneInChamber_OnTakeDamage(int victim, int &attacker, int &inflicto
     char weapon[32];
     GetClientWeapon(attacker, weapon, sizeof(weapon));
 
-    if ((StrContains(weapon, "knife") != -1)||(StrContains(weapon, "usp") != -1))
+    if (StrContains(weapon, "knife") || StrContains(weapon, "usp"))
     { 
         int weaponvictim = GetPlayerWeaponSlot(victim, CS_SLOT_SECONDARY);
 
