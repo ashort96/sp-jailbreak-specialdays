@@ -19,7 +19,7 @@
 #define PLUGIN_NAME         "CS:S Jailbreak Special Days"
 #define PLUGIN_AUTHOR       "organharvester, Jordi, Dunder"
 #define PLUGIN_DESCRIPTION  "Jailbreak Special Days"
-#define PLUGIN_VERSION      "4.4"
+#define PLUGIN_VERSION      "4.5"
 #define PLUGIN_URL          "https://github.com/ashort96/sp-jailbreak-specialdays"
 
 #include <cstrike>
@@ -204,7 +204,7 @@ public Action Command_WardenSpecialDay(int client, int args)
         return Plugin_Handled;
     }
 
-    g_Cooldown = 51;
+    g_Cooldown = g_ConVarCooldown.IntValue;
 
     Callback_SpecialDay(client);
     return Plugin_Handled;
