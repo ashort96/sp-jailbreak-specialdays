@@ -22,10 +22,6 @@ public void SpecialDay_DeathMatch_Begin()
     for (int i = 0; i < MAXPLAYERS; i++)
     {
         g_DeathMatchKills[i] = 0;
-        if (IsValidClient(i))
-        {
-            DisplayGunMenu(i);
-        }
     }
 
     CreateTimer(90.0, Timer_DeathMatchEnd);
