@@ -457,6 +457,7 @@ public int MenuHandler_SpecialDay(Menu menu, MenuAction action, int param1, int 
         {
             case deathMatch:
             {
+                DisplayGunMenuToAll();
                 SpecialDay_Begin = SpecialDay_DeathMatch_Begin;
                 SpecialDay_End = SpecialDay_DeathMatch_End;
             }
